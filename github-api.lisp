@@ -3,14 +3,15 @@
   (:use :cl)
   (:export :get-response
 	   :parse-response
-	   :print-results))
+	   :print-results
+	   :main))
 
 (in-package :github-api)
 
 
 (defparameter *github-uri* "https://api.github.com/users/")
 
-(defun get-response (username)
+(function-cache:defcached get-response (username)
   "Send a GET request to github api and return the answer"
   (dex:get (concatenate 'string *github-uri* username)))
 
@@ -21,3 +22,11 @@
 (defun print-results (parsed-response &optional (fields '(:|name| :|email| :|location| :|blog| :|twitter_username| :|bio| :|company| :|public_repos| :|created_at| :|updated_at|)))
   "Print the results of the API in a beautiful way"
   (map 'nil #'(lambda (key) (format t "~A~10T~A~&" key (getf parsed-response key))) fields))
+
+
+(defun main ()
+  "runs the github-api function in a username passed through cli"
+  (let ((args (uiop:command-line-arguments)))
+    (github-api:print-results
+    (github-api:parse-response
+    (github-api:get-response (first args))))))
