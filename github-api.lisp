@@ -21,12 +21,13 @@
 
 (defun print-results (parsed-response &optional (fields '(:|name| :|email| :|location| :|blog| :|twitter_username| :|bio| :|company| :|public_repos| :|created_at| :|updated_at|)))
   "Print the results of the API in a beautiful way"
-  (map 'nil #'(lambda (key) (format t "~A~10T~A~&" key (getf parsed-response key))) fields))
+  (let ((setf (getf parsed-response :|created_at|) ))
+  (map 'nil #'(lambda (key) (format t "~A~10T~A~&" key (getf parsed-response key))) fields)))
 
 
 (defun main ()
   "runs the github-api function in a username passed through cli"
   (let ((args (uiop:command-line-arguments)))
-    (github-api:print-results
-    (github-api:parse-response
-    (github-api:get-response (first args))))))
+    (print-results
+    (parse-response
+    (get-response (first args))))))
